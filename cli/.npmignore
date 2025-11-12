@@ -1,0 +1,25 @@
+# Source files (only ship dist/)
+src/
+tsconfig.json
+.eslintrc.js
+
+# Tests
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+
+# Development
+.vscode/
+.idea/
+*.swp
+
+# Documentation (README is included)
+docs/
+
+# Git
+.git/
+.gitignore
+
+# CI
+.github/
