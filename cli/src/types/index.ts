@@ -12,6 +12,8 @@ export interface StickyConfig {
   currentProfile?: string;
   vercelProjectId?: string;
   vercelToken?: string;
+  installScript?: string; // Custom install command to run after switching
+  autoInstall?: boolean; // Auto-detect and install dependencies
 }
 
 export interface EnvFile {

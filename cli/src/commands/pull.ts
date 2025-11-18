@@ -2,10 +2,12 @@ import { Command } from 'commander';
 import { VercelClient } from '../lib/vercel';
 import { ConfigManager, saveProfilesToDisk } from '../lib/config';
 import { log, spinner } from '../utils/ui';
+import { autoInstall, runCustomInstallScript } from '../utils/installer';
 
 export const pullCommand = new Command('pull')
   .description('Pull profiles from Vercel Development environment')
-  .action(async () => {
+  .option('--install', 'Auto-install dependencies after pulling')
+  .action(async (options: { install?: boolean }) => {
     try {
       const configManager = new ConfigManager();
       const config = await configManager.load();
@@ -78,6 +80,25 @@ export const pullCommand = new Command('pull')
 
         console.log();
         log.info('Switch to a profile with: sticky use <profile>');
+
+        // Auto-install dependencies if requested or configured
+        const shouldInstall = options.install || config.autoInstall;
+
+        if (shouldInstall) {
+          console.log();
+          try {
+            // Run custom install script if configured
+            if (config.installScript) {
+              await runCustomInstallScript(config.installScript);
+            } else {
+              // Auto-detect and install
+              await autoInstall();
+            }
+          } catch (error: any) {
+            log.warning(`Install failed: ${error.message}`);
+            log.info('You may need to install dependencies manually.');
+          }
+        }
       } catch (error: any) {
         pullSpinner.fail(`Failed to pull from Vercel: ${error.message}`);
         process.exit(1);

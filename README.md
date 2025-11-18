@@ -60,6 +60,9 @@ npm run dev            # Your app uses staging environment
 
 sticky use dev         # Switch to dev
 sticky use production  # Switch to production (requires confirmation)
+
+# Auto-install dependencies when switching
+sticky use staging --install   # Switches profile AND runs npm install
 ```
 
 ### 4. Check current profile
@@ -135,6 +138,50 @@ sticky use staging  # Done!
 ✅ Production safety (requires confirmation)
 ✅ Works with any language/framework
 ✅ Zero config needed
+✅ Auto-install dependencies (npm, pip, go, etc.)
+
+---
+
+## Auto-Install (Optional)
+
+Sticky.env can automatically install dependencies when you switch profiles or pull changes.
+
+### One-time setup
+
+```bash
+# Use --install flag
+sticky use staging --install
+sticky pull --install
+
+# Or enable auto-install globally in .stickyrc
+{
+  "profiles": ["dev", "staging", "production"],
+  "autoInstall": true
+}
+```
+
+### Supported package managers
+
+- **npm** (package.json)
+- **yarn** (yarn.lock)
+- **pnpm** (pnpm-lock.yaml)
+- **bun** (bun.lockb)
+- **pip** (requirements.txt)
+- **pipenv** (Pipfile)
+- **poetry** (poetry.lock)
+- **go** (go.mod)
+- **cargo** (Cargo.toml)
+- **composer** (composer.json)
+- **bundle** (Gemfile)
+
+### Custom install script
+
+Add to `.stickyrc`:
+```json
+{
+  "installScript": "npm install && npx prisma generate"
+}
+```
 
 ---
 

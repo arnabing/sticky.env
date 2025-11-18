@@ -2,12 +2,14 @@ import { Command } from 'commander';
 import { ConfigManager, loadProfilesFromDisk } from '../lib/config';
 import { writeEnvFile } from '../lib/profiles';
 import { log, spinner, confirm } from '../utils/ui';
+import { autoInstall, runCustomInstallScript } from '../utils/installer';
 import chalk from 'chalk';
 
 export const useCommand = new Command('use')
   .description('Switch to a different profile')
   .argument('<profile>', 'Profile name to switch to')
-  .action(async (profileName: string) => {
+  .option('--install', 'Auto-install dependencies after switching')
+  .action(async (profileName: string, options: { install?: boolean }) => {
     try {
       const configManager = new ConfigManager();
       const config = await configManager.load();
@@ -92,6 +94,26 @@ export const useCommand = new Command('use')
       }
 
       console.log();
+
+      // Auto-install dependencies if requested or configured
+      const shouldInstall = options.install || config.autoInstall;
+
+      if (shouldInstall) {
+        try {
+          // Run custom install script if configured
+          if (config.installScript) {
+            await runCustomInstallScript(config.installScript);
+          } else {
+            // Auto-detect and install
+            await autoInstall();
+          }
+        } catch (error: any) {
+          log.warning(`Install failed: ${error.message}`);
+          log.info('You may need to install dependencies manually.');
+        }
+        console.log();
+      }
+
       log.info('Run your app - it will now use the new profile:');
       log.info(`  ${chalk.cyan('npm run dev')}`);
     } catch (error: any) {
